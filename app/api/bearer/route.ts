@@ -22,13 +22,17 @@ function parseBatch(lines: string): { accounts: string[]; bearers: string[] } {
   for (const raw of lines.split(/\r?\n/)) {
     const line = raw.trim();
     if (!line) continue;
-    // account----bearer  or  account\tbearer  or  account,bearer
+    // account----bearer / account---bearer / tab / comma（只按首个分隔符切，Bearer 里可含 -）
     let account = "";
     let bearer = "";
     if (line.includes("----")) {
       const i = line.indexOf("----");
       account = line.slice(0, i).trim();
       bearer = line.slice(i + 4).trim();
+    } else if (line.includes("---")) {
+      const i = line.indexOf("---");
+      account = line.slice(0, i).trim();
+      bearer = line.slice(i + 3).trim();
     } else if (line.includes("\t")) {
       const parts = line.split("\t");
       account = (parts[0] || "").trim();
@@ -38,7 +42,7 @@ function parseBatch(lines: string): { accounts: string[]; bearers: string[] } {
       account = line.slice(0, i).trim();
       bearer = line.slice(i + 1).trim();
     } else {
-      throw new Error(`无法解析行（需 account----bearer）：${line.slice(0, 40)}`);
+      throw new Error(`无法解析行（需 account---bearer 或 account----bearer）：${line.slice(0, 40)}`);
     }
     if (!account) throw new Error("空 account");
     accounts.push(account);

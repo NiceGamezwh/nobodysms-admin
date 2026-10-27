@@ -325,12 +325,12 @@ export default function HomePage() {
 
           <div className="card">
             <h3>批量 setBearerBatch</h3>
-            <p className="muted">每行一条：<code>account----bearer</code>（也支持 Tab / 逗号分隔）</p>
+            <p className="muted">每行一条：<code>account---bearer</code> 或 <code>account----bearer</code>（也支持 Tab / 逗号）</p>
             <div className="field">
               <textarea
                 value={batchLines}
                 onChange={(e) => setBatchLines(e.target.value)}
-                placeholder={"acc1----bearer1\nacc2----bearer2"}
+                placeholder={"acc1---bearer1\nacc2---bearer2"}
               />
             </div>
             <button
