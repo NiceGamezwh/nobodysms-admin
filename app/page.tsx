@@ -26,7 +26,7 @@ function cardTabLabel(tab: CardTab): string {
     case "r30":
       return "充值30元";
     case "r60":
-      return "充值60元";
+      return "充值150元";
   }
 }
 
@@ -45,7 +45,7 @@ function cardAmountLabel(tab: CardTab): string {
     case "r30":
       return "30元";
     case "r60":
-      return "60元";
+      return "150元";
   }
 }
 
