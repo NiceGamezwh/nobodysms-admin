@@ -6,7 +6,7 @@ type Tab = "bearer" | "3" | "15" | "30" | "r15" | "r30" | "r60";
 
 type CardTab = Exclude<Tab, "bearer">;
 const CARD_TABS: CardTab[] = ["3", "15", "30", "r15", "r30", "r60"];
-const REGISTER_TABS: CardTab[] = ["3", "15", "30"];
+const REGISTER_TABS: CardTab[] = ["3"]; // 15/30 注册档已下架，仅保留原 3 元合约作注册专用
 const RECHARGE_TABS: CardTab[] = ["r15", "r30", "r60"];
 
 function isCardTab(tab: Tab): tab is CardTab {
@@ -16,7 +16,7 @@ function isCardTab(tab: Tab): tab is CardTab {
 function cardTabLabel(tab: CardTab): string {
   switch (tab) {
     case "3":
-      return "注册3元";
+      return "注册专用¥0.1";
     case "15":
       return "注册15元";
     case "30":
@@ -37,7 +37,7 @@ function cardKindLabel(tab: CardTab): string {
 function cardAmountLabel(tab: CardTab): string {
   switch (tab) {
     case "3":
-      return "3元";
+      return "注册专用¥0.1";
     case "15":
     case "r15":
       return "15元";
