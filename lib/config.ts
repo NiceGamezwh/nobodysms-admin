@@ -1,16 +1,18 @@
 import fs from "fs";
 import path from "path";
 
+export type CardTier = "3" | "15" | "30" | "r15" | "r30" | "r60";
+
+export const CARD_TIERS: CardTier[] = ["3", "15", "30", "r15", "r30", "r60"];
+export const REGISTER_CARD_TIERS: CardTier[] = ["3", "15", "30"];
+export const RECHARGE_CARD_TIERS: CardTier[] = ["r15", "r30", "r60"];
+
 export type AppConfig = {
   rpcUrl: string;
   privateKey: string;
   adminPassword: string | null;
   bearerRegistry: string;
-  cards: {
-    "3": string;
-    "15": string;
-    "30": string;
-  };
+  cards: Record<CardTier, string>;
 };
 
 function loadOptionalEnvFile(filePath: string) {
@@ -55,6 +57,12 @@ function loadOptionalJson(filePath: string) {
       MEMBER_CARD_3: data.MEMBER_CARD_3 || data.card3 || "",
       MEMBER_CARD_15: data.MEMBER_CARD_15 || data.card15 || "",
       MEMBER_CARD_30: data.MEMBER_CARD_30 || data.card30 || "",
+      MEMBER_CARD_R15:
+        data.MEMBER_CARD_R15 || data.RECHARGE_CARD_15 || data.cardR15 || "",
+      MEMBER_CARD_R30:
+        data.MEMBER_CARD_R30 || data.RECHARGE_CARD_30 || data.cardR30 || "",
+      MEMBER_CARD_R60:
+        data.MEMBER_CARD_R60 || data.RECHARGE_CARD_60 || data.cardR60 || "",
     };
     for (const [k, v] of Object.entries(map)) {
       if (v && (!(k in process.env) || process.env[k] === "")) {
@@ -100,13 +108,35 @@ export function getConfig(): AppConfig {
     process.env.MEMBER_CARD_30 ||
     "0xFC76E223573BC92F24a2A956cd6f771D1059de6d"
   ).trim();
+  const cardR15 = (
+    process.env.MEMBER_CARD_R15 ||
+    process.env.RECHARGE_CARD_15 ||
+    "0x4668114059aF15AC701045AD311DFa974370Ef0e"
+  ).trim();
+  const cardR30 = (
+    process.env.MEMBER_CARD_R30 ||
+    process.env.RECHARGE_CARD_30 ||
+    "0x0785Bf86A9B9869940F4F605c58386a4BFD0E1CB"
+  ).trim();
+  const cardR60 = (
+    process.env.MEMBER_CARD_R60 ||
+    process.env.RECHARGE_CARD_60 ||
+    "0x9aCDfa778ED64AB2D1297FB735862ebdEC97Bc12"
+  ).trim();
 
   return {
     rpcUrl,
     privateKey,
     adminPassword,
     bearerRegistry,
-    cards: { "3": card3, "15": card15, "30": card30 },
+    cards: {
+      "3": card3,
+      "15": card15,
+      "30": card30,
+      r15: cardR15,
+      r30: cardR30,
+      r60: cardR60,
+    },
   };
 }
 
@@ -115,7 +145,14 @@ export function getCardAddress(
   cfg?: AppConfig
 ): string | null {
   const c = cfg || getConfig();
-  if (tier === "3" || tier === "15" || tier === "30") {
+  if (
+    tier === "3" ||
+    tier === "15" ||
+    tier === "30" ||
+    tier === "r15" ||
+    tier === "r30" ||
+    tier === "r60"
+  ) {
     return c.cards[tier];
   }
   return null;

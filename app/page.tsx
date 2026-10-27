@@ -2,7 +2,52 @@
 
 import { useCallback, useEffect, useState } from "react";
 
-type Tab = "bearer" | "3" | "15" | "30";
+type Tab = "bearer" | "3" | "15" | "30" | "r15" | "r30" | "r60";
+
+type CardTab = Exclude<Tab, "bearer">;
+const CARD_TABS: CardTab[] = ["3", "15", "30", "r15", "r30", "r60"];
+const REGISTER_TABS: CardTab[] = ["3", "15", "30"];
+const RECHARGE_TABS: CardTab[] = ["r15", "r30", "r60"];
+
+function isCardTab(tab: Tab): tab is CardTab {
+  return tab !== "bearer";
+}
+
+function cardTabLabel(tab: CardTab): string {
+  switch (tab) {
+    case "3":
+      return "注册3元";
+    case "15":
+      return "注册15元";
+    case "30":
+      return "注册30元";
+    case "r15":
+      return "充值15元";
+    case "r30":
+      return "充值30元";
+    case "r60":
+      return "充值60元";
+  }
+}
+
+function cardKindLabel(tab: CardTab): string {
+  return RECHARGE_TABS.includes(tab) ? "充值卡密" : "注册卡密";
+}
+
+function cardAmountLabel(tab: CardTab): string {
+  switch (tab) {
+    case "3":
+      return "3元";
+    case "15":
+    case "r15":
+      return "15元";
+    case "30":
+    case "r30":
+      return "30元";
+    case "r60":
+      return "60元";
+  }
+}
 
 type MemberStatus = {
   address: string;
@@ -25,7 +70,7 @@ type StatusPayload = {
     wallet: string | null;
     isOwner: boolean;
   };
-  cards: Record<"3" | "15" | "30", MemberStatus>;
+  cards: Record<"3" | "15" | "30" | "r15" | "r30" | "r60", MemberStatus>;
 };
 
 async function api<T = unknown>(
@@ -182,10 +227,8 @@ export default function HomePage() {
     );
   }
 
-  const cardStatus =
-    tab === "3" || tab === "15" || tab === "30"
-      ? status?.cards?.[tab]
-      : null;
+  const cardStatus = isCardTab(tab) ? status?.cards?.[tab] : null;
+  const isRechargeTab = isCardTab(tab) && RECHARGE_TABS.includes(tab);
 
   return (
     <div className="container">
@@ -221,23 +264,26 @@ export default function HomePage() {
       )}
 
       <div className="tabs">
-        {(
-          [
-            ["bearer", "Bearer 管理"],
-            ["3", "3元卡密"],
-            ["15", "15元卡密"],
-            ["30", "30元卡密"],
-          ] as const
-        ).map(([id, label]) => (
+        <button
+          className={`tab ${tab === "bearer" ? "active" : ""}`}
+          onClick={() => {
+            setTab("bearer");
+            setResult(null);
+          }}
+        >
+          Bearer 管理
+        </button>
+        {CARD_TABS.map((id) => (
           <button
             key={id}
             className={`tab ${tab === id ? "active" : ""}`}
             onClick={() => {
               setTab(id);
               setResult(null);
+              setCardsText("");
             }}
           >
-            {label}
+            {cardTabLabel(id)}
           </button>
         ))}
       </div>
@@ -383,11 +429,11 @@ export default function HomePage() {
         </>
       )}
 
-      {(tab === "3" || tab === "15" || tab === "30") && cardStatus && (
+      {isCardTab(tab) && cardStatus && (
         <>
           <div className="stat-grid">
             <div className="stat">
-              <div className="k">合约地址（{tab}元）</div>
+              <div className="k">合约地址（{cardKindLabel(tab)} · {cardAmountLabel(tab)}）</div>
               <div className="v mono">
                 <a
                   href={`https://sepolia.etherscan.io/address/${cardStatus.address}`}
@@ -424,12 +470,20 @@ export default function HomePage() {
 
           <div className="card">
             <h3>addCards(string[]) — 上新卡密</h3>
-            <p className="muted">每行一张完整卡密字符串（合约不解析分隔符）</p>
+            <p className="muted">
+              {isRechargeTab
+                ? "每行一张充值单码（无 ---- 分隔符）"
+                : "每行一张完整卡密字符串（账号----密码）"}
+            </p>
             <div className="field">
               <textarea
                 value={cardsText}
                 onChange={(e) => setCardsText(e.target.value)}
-                placeholder={"账号----密码\n..."}
+                placeholder={
+                  isRechargeTab
+                    ? "Gc47ED2DF6D5473E3D0B974C748BF1BB95\n..."
+                    : "账号----密码\n..."
+                }
               />
             </div>
             <button
@@ -458,7 +512,7 @@ export default function HomePage() {
               className="warn"
               disabled={busy}
               onClick={() => {
-                if (!confirm(`确认从 ${tab}元 队列取出下一张卡密？`)) return;
+                if (!confirm(`确认从 ${cardKindLabel(tab)} ${cardAmountLabel(tab)} 队列取出下一张卡密？`)) return;
                 run(() =>
                   api("/api/cards", {
                     method: "POST",

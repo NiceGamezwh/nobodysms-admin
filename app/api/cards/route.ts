@@ -36,7 +36,7 @@ export async function GET(req: NextRequest) {
   const indexStr = req.nextUrl.searchParams.get("index");
   const addr = getCardAddress(tier);
   if (!addr) {
-    return NextResponse.json({ error: "tier 必须是 3 / 15 / 30" }, { status: 400 });
+    return NextResponse.json({ error: "tier 必须是 3 / 15 / 30 / r15 / r30 / r60" }, { status: 400 });
   }
   try {
     const c = getMemberContract(addr, false);
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
   const tier = String(body.tier || "");
   const addr = getCardAddress(tier, getConfig());
   if (!addr) {
-    return NextResponse.json({ error: "tier 必须是 3 / 15 / 30" }, { status: 400 });
+    return NextResponse.json({ error: "tier 必须是 3 / 15 / 30 / r15 / r30 / r60" }, { status: 400 });
   }
 
   try {

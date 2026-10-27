@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requestAuthorized } from "@/lib/auth";
-import { getConfig, getCardAddress } from "@/lib/config";
+import { CARD_TIERS, getConfig, getCardAddress } from "@/lib/config";
 import { readBearerStatus, readMemberStatus } from "@/lib/contracts";
 
 export const runtime = "nodejs";
@@ -18,19 +18,21 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    const [bearer, card3, card15, card30] = await Promise.all([
+    const [bearer, ...cardStatuses] = await Promise.all([
       readBearerStatus(),
-      readMemberStatus(getCardAddress("3", cfg)!),
-      readMemberStatus(getCardAddress("15", cfg)!),
-      readMemberStatus(getCardAddress("30", cfg)!),
+      ...CARD_TIERS.map((tier) => readMemberStatus(getCardAddress(tier, cfg)!)),
     ]);
+    const cards: Record<string, (typeof cardStatuses)[number]> = {};
+    CARD_TIERS.forEach((tier, i) => {
+      cards[tier] = cardStatuses[i];
+    });
     return NextResponse.json({
       network: "sepolia",
       chainId: 11155111,
       hasPrivateKey: !!cfg.privateKey,
       authRequired: !!cfg.adminPassword,
       bearer,
-      cards: { "3": card3, "15": card15, "30": card30 },
+      cards,
     });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
