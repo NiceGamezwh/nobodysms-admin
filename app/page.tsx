@@ -429,7 +429,7 @@ export default function HomePage() {
               <textarea
                 value={cardsText}
                 onChange={(e) => setCardsText(e.target.value)}
-                placeholder={"账号----密码---安全密码\n..."}
+                placeholder={"账号----密码\n..."}
               />
             </div>
             <button

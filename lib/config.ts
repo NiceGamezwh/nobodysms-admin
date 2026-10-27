@@ -90,15 +90,15 @@ export function getConfig(): AppConfig {
   ).trim();
   const card3 = (
     process.env.MEMBER_CARD_3 ||
-    "0xFd2d0EaEe67C0393f5218b8045824072f3727bAd"
+    "0xE482CC61DF0dBca6AB3A694a8813Bacf13A04976"
   ).trim();
   const card15 = (
     process.env.MEMBER_CARD_15 ||
-    "0xB482054498Fd24B8D55eB6A9AA26fA4fb18eAE85"
+    "0x4F3C14b4cFC5D3a27B00FF737Eab28D948517c9e"
   ).trim();
   const card30 = (
     process.env.MEMBER_CARD_30 ||
-    "0x9c06E39BE91e348dbCAc3A9338fC7c1E002A54A3"
+    "0xFC76E223573BC92F24a2A956cd6f771D1059de6d"
   ).trim();
 
   return {
