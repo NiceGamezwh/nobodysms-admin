@@ -9,11 +9,6 @@ out/
 build/
 dist/
 
-# env / secrets — never commit
-.env
-.env.local
-.env.*.local
-config/local.env
 config.json
 !.env.example
 
