@@ -16,7 +16,7 @@ function isCardTab(tab: Tab): tab is CardTab {
 function cardTabLabel(tab: CardTab): string {
   switch (tab) {
     case "3":
-      return "注册专用¥0.1";
+      return "注册专用¥0.01";
     case "15":
       return "注册15元";
     case "30":
@@ -37,7 +37,7 @@ function cardKindLabel(tab: CardTab): string {
 function cardAmountLabel(tab: CardTab): string {
   switch (tab) {
     case "3":
-      return "注册专用¥0.1";
+      return "注册专用¥0.01";
     case "15":
     case "r15":
       return "15元";
